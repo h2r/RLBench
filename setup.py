@@ -1,4 +1,4 @@
-from setuptools import setup
+from distutils.core import setup
 
 # Version meaning (X.Y.Z)
 # X: Major version (e.g. vastly different scene, platform, etc)
@@ -6,7 +6,7 @@ from setuptools import setup
 # Z: Patch version (e.g. small changes to tasks, bug fixes, etc)
 
 setup(name='rlbench',
-      version='1.0.8',
+      version='1.0.6',
       description='RLBench',
       author='Stephen James',
       author_email='slj12@ic.ac.uk',

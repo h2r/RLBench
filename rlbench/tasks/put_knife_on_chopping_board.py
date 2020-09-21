@@ -24,6 +24,7 @@ class PutKnifeOnChoppingBoard(Task):
     def init_episode(self, index: int) -> List[str]:
         self.boundary.clear()
         self.boundary.sample(self.knife_block)
+        self.boundary.sample(self.chopping_board)
         return ['put the knife on the chopping board',
                 'slide the knife out of the knife block and put it down on the '
                 'chopping board',
@@ -33,3 +34,6 @@ class PutKnifeOnChoppingBoard(Task):
 
     def variation_count(self) -> int:
         return 1
+
+    def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
+        return [0, 0, 0], [0, 0, 0]

@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List
 from pyrep import PyRep
 from pyrep.errors import ConfigurationPathError
 from pyrep.objects.shape import Shape
@@ -53,15 +53,6 @@ class Scene(object):
 
         # Set camera properties from observation config
         self._set_camera_properties()
-
-        x, y, z = self._workspace.get_position()
-        minx, maxx, miny, maxy, _, _ = self._workspace.get_bounding_box()
-        self._workspace_minx = x - np.fabs(minx)
-        self._workspace_maxx = x + maxx
-        self._workspace_miny = y - np.fabs(miny)
-        self._workspace_maxy = y + maxy
-        self._workspace_minz = z
-        self._workspace_maxz = z + 1.0  # 1M above workspace
 
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
@@ -145,6 +136,7 @@ class Scene(object):
         if self._active_task is not None and self._has_init_task:
             self._active_task.cleanup_()
             self._active_task.restore_state(self._inital_task_state)
+        [self._pyrep.step_ui() for _ in range(20)]
         self._active_task.set_initial_objects_in_scene()
 
     def get_observation(self) -> Observation:
@@ -246,15 +238,12 @@ class Scene(object):
                 if self._obs_config.joint_positions else None),
             joint_forces=(joint_forces
                           if self._obs_config.joint_forces else None),
-            gripper_open=(
+            gripper_open_amount=(
                 (1.0 if self._robot.gripper.get_open_amount()[0] > 0.9 else 0.0)
-                if self._obs_config.gripper_open else None),
+                if self._obs_config.gripper_open_amount else None),
             gripper_pose=(
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
-            gripper_matrix=(
-                np.reshape(tip.get_matrix(), (3, 4))[:3, :3].reshape((-1,))
-                if self._obs_config.gripper_matrix else None),
             gripper_touch_forces=(
                 ee_forces_flat
                 if self._obs_config.gripper_touch_forces else None),
@@ -271,9 +260,8 @@ class Scene(object):
         self._pyrep.step()
         self._active_task.step()
 
-    def get_demo(self, record: bool = True,
-                 callable_each_step: Callable[[Observation], None] = None,
-                 randomly_place: bool = True) -> Demo:
+    def get_demo(self, record: bool=True, func=None,
+                 randomly_place: bool=True) -> Demo:
         """Returns a demo (list of observations)"""
 
         if not self._has_init_task:
@@ -311,13 +299,20 @@ class Scene(object):
                 while not done:
                     done = path.step()
                     self.step()
-                    self._demo_record_step(demo, record, callable_each_step)
+                    self._demo_record_step(demo, record, func)
                     success, term = self._active_task.success()
+                    if success:
+                        break
 
                 point.end_of_path()
 
                 path.clear_visualization()
 
+                if success:
+                    # We can quit early because we have finished the task
+                    break
+
+                # TODO: need to decide how I do the gripper actions
                 if len(ext) > 0:
                     contains_param = False
                     start_of_bracket = -1
@@ -333,8 +328,7 @@ class Scene(object):
                                 self._pyrep.step()
                                 self._active_task.step()
                                 if self._obs_config.record_gripper_closing:
-                                    self._demo_record_step(
-                                        demo, record, callable_each_step)
+                                    self._demo_record_step(demo, record, func)
                     elif 'close_gripper(' in ext:
                         start_of_bracket = ext.index('close_gripper(') + 14
                         contains_param = ext[start_of_bracket] != ')'
@@ -345,8 +339,7 @@ class Scene(object):
                                 self._pyrep.step()
                                 self._active_task.step()
                                 if self._obs_config.record_gripper_closing:
-                                    self._demo_record_step(
-                                        demo, record, callable_each_step)
+                                    self._demo_record_step(demo, record, func)
 
                     if contains_param:
                         rest = ext[start_of_bracket:]
@@ -357,14 +350,13 @@ class Scene(object):
                             self._pyrep.step()
                             self._active_task.step()
                             if self._obs_config.record_gripper_closing:
-                                self._demo_record_step(
-                                    demo, record, callable_each_step)
+                                self._demo_record_step(demo, record, func)
 
                     if 'close_gripper(' in ext:
                         for g_obj in self._active_task.get_graspable_objects():
                             gripper.grasp(g_obj)
 
-                    self._demo_record_step(demo, record, callable_each_step)
+                    self._demo_record_step(demo, record, func)
 
             if not self._active_task.should_repeat_waypoints() or success:
                 break
@@ -375,7 +367,7 @@ class Scene(object):
             for _ in range(10):
                 self._pyrep.step()
                 self._active_task.step()
-                self._demo_record_step(demo, record, callable_each_step)
+                self._demo_record_step(demo, record, func)
                 success, term = self._active_task.success()
                 if success:
                     break
@@ -389,17 +381,11 @@ class Scene(object):
     def get_observation_config(self) -> ObservationConfig:
         return self._obs_config
 
-    def check_target_in_workspace(self, target_pos: np.ndarray) -> bool:
-        x, y, z = target_pos
-        return (self._workspace_maxx > x > self._workspace_minx and
-                self._workspace_maxy > y > self._workspace_miny and
-                self._workspace_maxz > z > self._workspace_minz)
-
     def _demo_record_step(self, demo_list, record, func):
         if record:
             demo_list.append(self.get_observation())
         if func is not None:
-            func(self.get_observation())
+            func()
 
     def _set_camera_properties(self) -> None:
         def _set_rgb_props(rgb_cam: VisionSensor,

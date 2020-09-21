@@ -21,5 +21,5 @@ VARIATION_DESCRIPTIONS = 'variation_descriptions.pkl'
 
 TTT_FILE = 'task_design.ttt'
 
-DEPTH_SCALE = 2**24 - 1
+DEPTH_SCALE = 1000.0
 

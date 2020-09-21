@@ -1,4 +1,3 @@
-from pyrep import __version__ as pyrep_version
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.arms.jaco import Jaco
@@ -8,10 +7,6 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
 from pyrep.robots.end_effectors.mico_gripper import MicoGripper
 from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
-
-from rlbench import utils
-from rlbench.demo import Demo
-
 from rlbench.sim2real.domain_randomization import RandomizeEvery, \
     VisualRandomizationConfig, DynamicsRandomizationConfig
 
@@ -23,14 +18,12 @@ from rlbench.backend.const import *
 from rlbench.backend.robot import Robot
 from os.path import exists, dirname, abspath, join
 import importlib
-from typing import Type, List
+from typing import Type
 from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.action_modes import ActionMode, ArmActionMode
 
-major, minor = pyrep_version.split('.')
-if int(major) < 1 and int(minor) < 2:
-    raise ImportError('Must have PyRep version 1.2 or greater.')
+import numpy as np
 
 
 DIR_PATH = dirname(abspath(__file__))
@@ -95,13 +88,13 @@ class Environment(object):
             self._robot.arm.set_control_loop_enabled(False)
             self._robot.arm.set_motor_locked_at_zero_velocity(True)
         elif (self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION or
-              self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
-              self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
+                self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
+                self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY or
+                self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
             self._robot.arm.set_control_loop_enabled(True)
         elif (self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
                 self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE):
@@ -148,6 +141,9 @@ class Environment(object):
             arm.set_position(panda_pos)
         else:
             arm, gripper = arm_class(), gripper_class()
+            pos = arm.get_position()
+            pos = [p + np.random.rand()/3 - 1/6 for p in pos]
+            #arm.set_position(pos) ###############################################################################################
 
         self._robot = Robot(arm, gripper)
         if self._randomize_every is None:
@@ -189,26 +185,13 @@ class Environment(object):
                 self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION or
                 self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
                 self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
-                self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE):
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE or
+                self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY):
             arm_action_size = SUPPORTED_ROBOTS[self._robot_configuration][2]
-        elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
-              self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
+        elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
             arm_action_size = 7  # pose is always 7
         return arm_action_size + gripper_action_size
-
-    def get_demos(self, task_name: str, amount: int,
-                  variation_number=0,
-                  image_paths=False) -> List[Demo]:
-        if self._dataset_root is None or len(self._dataset_root) == 0:
-            raise RuntimeError(
-                "Can't ask for a stored demo when no dataset root provided.")
-        demos = utils.get_stored_demos(
-            amount, image_paths, self._dataset_root, variation_number,
-            task_name, self._obs_config)
-        return demos
-
-

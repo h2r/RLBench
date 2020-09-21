@@ -21,30 +21,25 @@ class ArmActionMode(Enum):
     # Change in arm joint forces/torques
     DELTA_JOINT_TORQUE = 5
 
+    # Absolute end-effector velocity (position (3) and quaternion (4))
+    ABS_EE_VELOCITY = 6
+
+    # Change in end-effector velocity (position (3) and quaternion (4))
+    DELTA_EE_VELOCITY = 7
+
     # Absolute end-effector pose (position (3) and quaternion (4))
-    ABS_EE_POSE_WORLD_FRAME = 6
+    ABS_EE_POSE = 8
 
     # Change in end-effector pose (position (3) and quaternion (4))
-    DELTA_EE_POSE_WORLD_FRAME = 7
+    DELTA_EE_POSE = 9
 
     # Absolute end-effector pose (position (3) and quaternion (4))
     # But does path planning between these points
-    ABS_EE_POSE_PLAN_WORLD_FRAME = 8
+    ABS_EE_POSE_PLAN = 10
 
     # Change in end-effector pose (position (3) and quaternion (4))
     # But does path planning between these points
-    DELTA_EE_POSE_PLAN_WORLD_FRAME = 9
-
-    # Change in end-effector pose (position (3) and quaternion (4))
-    # In the end-effector frame
-    EE_POSE_EE_FRAME = 10
-
-    # Change in end-effector pose (position (3) and quaternion (4))
-    # But does path planning between these points.
-    # In the end-effector frame
-    EE_POSE_PLAN_EE_FRAME = 11
-
-    # NOTE: There is no ABS/DELTA mode for the EE_FRAME because ABS == DELTA
+    DELTA_EE_POSE_PLAN = 11
 
 
 class GripperActionMode(Enum):
@@ -56,7 +51,7 @@ class GripperActionMode(Enum):
 class ActionMode(object):
 
     def __init__(self,
-                 arm: ArmActionMode = ArmActionMode.ABS_JOINT_VELOCITY,
-                 gripper: GripperActionMode = GripperActionMode.OPEN_AMOUNT):
+                 arm: ArmActionMode=ArmActionMode.ABS_JOINT_VELOCITY,
+                 gripper: GripperActionMode=GripperActionMode.OPEN_AMOUNT):
         self.arm = arm
         self.gripper = gripper

@@ -1,7 +1,7 @@
 from rlbench.environment import Environment
 from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
-from rlbench.tasks import ReachTarget
+from rlbench.tasks import ReachTarget, StackBlocks, PushButtons, PutBooksOnBookshelf, BlockPyramid, PlaceShapeInShapeSorter, HitBallWithQueue
 import numpy as np
 
 
@@ -26,7 +26,13 @@ env = Environment(
     action_mode, DATASET, obs_config, False)
 env.launch()
 
-task = env.get_task(ReachTarget)
+# task = env.get_task(ReachTarget)
+# task = env.get_task(StackBlocks)
+# task = env.get_task(PushButtons)
+# task = env.get_task(PutBooksOnBookshelf)
+# task = env.get_task(BlockPyramid)
+# task = env.get_task(PlaceShapeInShapeSorter)
+task = env.get_task(HitBallWithQueue)
 
 il = ImitationLearning()
 
