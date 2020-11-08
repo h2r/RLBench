@@ -49,6 +49,7 @@ class Environment(object):
                  frequency: int=1,
                  visual_randomization_config: VisualRandomizationConfig=None,
                  dynamics_randomization_config: DynamicsRandomizationConfig=None,
+                 attach_grasped_objects: bool = True
                  ):
 
         self._dataset_root = dataset_root
@@ -62,6 +63,7 @@ class Environment(object):
         self._frequency = frequency
         self._visual_randomization_config = visual_randomization_config
         self._dynamics_randomization_config = dynamics_randomization_config
+        self._attach_grasped_objects = attach_grasped_objects
 
         if robot_configuration not in SUPPORTED_ROBOTS.keys():
             raise ValueError('robot_configuration must be one of %s' %
@@ -142,8 +144,19 @@ class Environment(object):
         else:
             arm, gripper = arm_class(), gripper_class()
             pos = arm.get_position()
-            pos = [p + np.random.rand()/3 - 1/6 for p in pos]
-            #arm.set_position(pos) ###############################################################################################
+            gripper_pos = gripper.get_position()
+            # pos = [p + np.random.rand()/3 - 1/6 for p in pos]
+            # pos = [-0.2, -0.45, 0.85] # First number moves arm base forwards and backwards, next moves it left and right
+            # gripper_pos = [0.26, -0.0061,  1.56]
+            ## IMPORTANT: This is wrong, it currenlty sets the position of the arm or gripper joint independently...
+            ## We want to fix the arm's base, but move it to a specific position
+            # Go find how something is made to move to a specific position and use that code!
+
+            # gripper_pos = [0.10, -0.0061,  1.56]
+            # gripper.set_position(gripper_pos)
+            # print(pos)
+            # print(gripper_pos)
+            # arm.set_position(pos) ###############################################################################################
 
         self._robot = Robot(arm, gripper)
         if self._randomize_every is None:
@@ -174,7 +187,7 @@ class Environment(object):
         return TaskEnvironment(
             self._pyrep, self._robot, self._scene, task,
             self._action_mode, self._dataset_root, self._obs_config,
-            self._static_positions)
+            self._static_positions, self._attach_grasped_objects)
 
     @property
     def action_size(self):

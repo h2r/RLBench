@@ -82,6 +82,7 @@ class Scene(object):
 
     def init_task(self) -> None:
         self._active_task.init_task()
+        self._inital_task_state = self._active_task.get_state()
         self._has_init_task = True
         self._variation_index = 0
 
@@ -172,7 +173,8 @@ class Scene(object):
             rgb_handles_to_mask if fc_ob.masks_as_one_channel else lambda x: x)
 
         def get_rgb_depth(sensor: VisionSensor, get_rgb: bool, get_depth: bool,
-                          rgb_noise: NoiseModel, depth_noise: NoiseModel):
+                          rgb_noise: NoiseModel, depth_noise: NoiseModel,
+                          depth_in_meters: bool):
             rgb = depth = None
             if sensor is not None and (get_rgb or get_depth):
                 sensor.handle_explicitly()
@@ -181,7 +183,7 @@ class Scene(object):
                     if rgb_noise is not None:
                         rgb = rgb_noise.apply(rgb)
                 if get_depth:
-                    depth = sensor.capture_depth()
+                    depth = sensor.capture_depth(depth_in_meters)
                     if depth_noise is not None:
                         depth = depth_noise.apply(depth)
             return rgb, depth
@@ -195,16 +197,16 @@ class Scene(object):
 
         left_shoulder_rgb, left_shoulder_depth = get_rgb_depth(
             self._cam_over_shoulder_left, lsc_ob.rgb, lsc_ob.depth,
-            lsc_ob.rgb_noise, lsc_ob.depth_noise)
+            lsc_ob.rgb_noise, lsc_ob.depth_noise, lsc_ob.depth_in_meters)
         right_shoulder_rgb, right_shoulder_depth = get_rgb_depth(
             self._cam_over_shoulder_right, rsc_ob.rgb, rsc_ob.depth,
-            rsc_ob.rgb_noise, rsc_ob.depth_noise)
+            rsc_ob.rgb_noise, rsc_ob.depth_noise, rsc_ob.depth_in_meters)
         wrist_rgb, wrist_depth = get_rgb_depth(
             self._cam_wrist, wc_ob.rgb, wc_ob.depth,
-            wc_ob.rgb_noise, wc_ob.depth_noise)
+            wc_ob.rgb_noise, wc_ob.depth_noise, wc_ob.depth_in_meters)
         front_rgb, front_depth = get_rgb_depth(
             self._cam_front, fc_ob.rgb, fc_ob.depth,
-            fc_ob.rgb_noise, fc_ob.depth_noise)
+            fc_ob.rgb_noise, fc_ob.depth_noise, fc_ob.depth_in_meters)
 
         left_shoulder_mask = get_mask(self._cam_over_shoulder_left_mask,
                                       lsc_mask_fn) if lsc_ob.mask else None
@@ -244,12 +246,18 @@ class Scene(object):
             gripper_pose=(
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
+            gripper_matrix=(
+                np.reshape(tip.get_matrix(), (3, 4))
+                if self._obs_config.gripper_matrix else None),
             gripper_touch_forces=(
                 ee_forces_flat
                 if self._obs_config.gripper_touch_forces else None),
             gripper_joint_positions=(
                 np.array(self._robot.gripper.get_joint_positions())
                 if self._obs_config.gripper_joint_positions else None),
+            wrist_camera_matrix=(
+                np.reshape(self._cam_wrist.get_matrix(), (3, 4))
+                if self._cam_wrist.still_exists() else None),
             task_low_dim_state=(
                 self._active_task.get_low_dim_state() if
                 self._obs_config.task_low_dim_state else None))
