@@ -100,7 +100,6 @@ def run(i, results, env):
 
     results[i] = tasks_with_problems
 
-
 def main(argv):
     manager = Manager()
     result_dict = manager.dict()
