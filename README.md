@@ -9,8 +9,6 @@ research areas, including: reinforcement learning, imitation learning,
 multi-task learning, geometric computer vision, and in particular, 
 few-shot learning. [Click here for website and paper.](https://sites.google.com/corp/view/rlbench)
 
-**Important**: Whenever you make a change, you need to recompile the library with `python setup.py install --user` for it to be registered!
-
 **Contents:**
 - [Announcements](#announcements)
 - [Install](#install)
@@ -292,7 +290,9 @@ waypoints, and a python (_.py_) file, which is responsible for wiring the
 scene objects to the RLBench backend, applying variations, defining success
 criteria, and adding other more complex task behaviours.
 
-Here are some in-depth tutorials:
+Video tutorial series [here](https://www.youtube.com/watch?v=bKaK_9O3v7Y&list=PLsffAlO5lBTRiBwnkw2-x0U7t6TrNCkfc)!
+
+In-depth text tutorials:
 - [Simple Task](tutorials/simple_task.md)
 - [Complex Task](tutorials/complex_task.md)
 

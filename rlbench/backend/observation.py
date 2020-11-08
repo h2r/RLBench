@@ -20,7 +20,7 @@ class Observation(object):
                  joint_velocities: np.ndarray,
                  joint_positions: np.ndarray,
                  joint_forces: np.ndarray,
-                 gripper_open_amount: float,
+                 gripper_open: float,
                  gripper_pose: np.ndarray,
                  gripper_matrix: np.ndarray,
                  gripper_joint_positions: np.ndarray,
@@ -42,7 +42,7 @@ class Observation(object):
         self.joint_velocities = joint_velocities
         self.joint_positions = joint_positions
         self.joint_forces = joint_forces
-        self.gripper_open = gripper_open_amount
+        self.gripper_open = gripper_open
         self.gripper_pose = gripper_pose
         self.gripper_matrix = gripper_matrix
         self.gripper_joint_positions = gripper_joint_positions
@@ -56,19 +56,10 @@ class Observation(object):
         :return: 1D array of observations.
         """
         low_dim_data = [] if self.gripper_open is None else [[self.gripper_open]]
-        '''
         for data in [self.joint_velocities, self.joint_positions,
                      self.joint_forces,
                      self.gripper_pose, self.gripper_joint_positions,
                      self.gripper_touch_forces, self.task_low_dim_state]:
             if data is not None:
                 low_dim_data.append(data)
-        '''
-        for data in [#self.joint_positions,
-                     self.gripper_pose, #self.gripper_joint_positions, self.gripper_touch_forces, 
-                     self.task_low_dim_state
-                     ]:
-            if data is not None:
-                low_dim_data.append(data)
-        #'''
-        return np.concatenate(low_dim_data)
+        return np.concatenate(low_dim_data) if len(low_dim_data) > 0 else np.array([])
