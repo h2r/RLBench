@@ -9,6 +9,8 @@ research areas, including: reinforcement learning, imitation learning,
 multi-task learning, geometric computer vision, and in particular, 
 few-shot learning. [Click here for website and paper.](https://sites.google.com/corp/view/rlbench)
 
+**Important**: Whenever you make a change, you need to recompile the library with `python setup.py install --user` for it to be registered!
+
 **Contents:**
 - [Announcements](#announcements)
 - [Install](#install)

@@ -22,6 +22,7 @@ class Observation(object):
                  joint_forces: np.ndarray,
                  gripper_open_amount: float,
                  gripper_pose: np.ndarray,
+                 gripper_matrix: np.ndarray,
                  gripper_joint_positions: np.ndarray,
                  gripper_touch_forces: np.ndarray,
                  wrist_camera_matrix: np.ndarray,
@@ -43,6 +44,7 @@ class Observation(object):
         self.joint_forces = joint_forces
         self.gripper_open = gripper_open_amount
         self.gripper_pose = gripper_pose
+        self.gripper_matrix = gripper_matrix
         self.gripper_joint_positions = gripper_joint_positions
         self.gripper_touch_forces = gripper_touch_forces
         self.wrist_camera_matrix = wrist_camera_matrix

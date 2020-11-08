@@ -43,6 +43,7 @@ class ObservationConfig(object):
                  joint_forces_noise: NoiseModel=Identity(),
                  gripper_open_amount=True,
                  gripper_pose=True,
+                 gripper_matrix=False,
                  gripper_joint_positions=False,
                  gripper_touch_forces=False,
                  wrist_camera_matrix=False,
@@ -69,6 +70,7 @@ class ObservationConfig(object):
         self.joint_forces_noise = joint_forces_noise
         self.gripper_open_amount = gripper_open_amount
         self.gripper_pose = gripper_pose
+        self.gripper_matrix = gripper_matrix
         self.gripper_joint_positions = gripper_joint_positions
         self.gripper_touch_forces = gripper_touch_forces
         self.wrist_camera_matrix = wrist_camera_matrix
@@ -91,6 +93,7 @@ class ObservationConfig(object):
         self.joint_forces = value
         self.gripper_open_amount = value
         self.gripper_pose = value
+        self.gripper_matrix = value
         self.gripper_joint_positions = value
         self.gripper_touch_forces = value
         self.wrist_camera_matrix = value
