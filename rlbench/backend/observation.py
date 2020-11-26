@@ -51,7 +51,7 @@ class Observation(object):
         self.task_low_dim_state = task_low_dim_state
 
     def get_low_dim_data(self) -> np.ndarray:
-        """Gets a 1D array of all the low-dimensional obseervations.
+        """Gets a 1D array of all the low-dimensional observations.
 
         :return: 1D array of observations.
         """
@@ -60,6 +60,11 @@ class Observation(object):
                      self.joint_forces,
                      self.gripper_pose, self.gripper_joint_positions,
                      self.gripper_touch_forces, self.task_low_dim_state]:
+        # for data in [#self.joint_positions,
+        #              self.gripper_pose, #self.gripper_joint_positions, self.gripper_touch_forces, 
+        #              self.task_low_dim_state
+        #              ]:
             if data is not None:
+                # print(data.shape)
                 low_dim_data.append(data)
         return np.concatenate(low_dim_data) if len(low_dim_data) > 0 else np.array([])

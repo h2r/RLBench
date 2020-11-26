@@ -29,7 +29,12 @@ class RLBenchEnv(gym.Env):
         else:
             raise ValueError(
                 'Unrecognised observation_mode: %s.' % observation_mode)
-        action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+
+        action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
+
+        # action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+        # action_mode = ActionMode(ArmActionMode.EE_POSE_PLAN_EE_FRAME)        
+        # action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN)
         self.env = Environment(
             action_mode, obs_config=obs_config, headless=True)
         self.env.launch()
