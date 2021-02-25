@@ -10,6 +10,7 @@ multi-task learning, geometric computer vision, and in particular,
 few-shot learning. [Click here for website and paper.](https://sites.google.com/corp/view/rlbench)
 
 **Contents:**
+- [H2R ToDo's and Notes](#ToDo's-and-H2R-Notes)
 - [Announcements](#announcements)
 - [Install](#install)
 - [Getting Started](#getting-started)
@@ -26,6 +27,11 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 - [Citation](#citation)
+
+
+## ToDo's and H2R Notes
+### ToDo's
+- Currently, the `RLBenchEnv()` class (found inside `rlbench_env.py` file) constructor includes a *hardcoded* action_mode setting (line 33 of the `rlbench_env.py` file), which must be changed manually depending on the learning algorithm from RobotLearningBaselines that is being run. Furthermore, to make the change persist, RLBench must be re-installed via `pip install .` from the root. This is less-than-ideal for reproducibility reasons. Can we alter to pass in the action-mode directly?    
 
 ## Announcements
 
