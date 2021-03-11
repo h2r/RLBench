@@ -17,7 +17,7 @@ class RLBenchEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
     def __init__(self, task_class, observation_mode='state',
-                 render_mode: Union[None, str] = None):
+                 render_mode: Union[None, str] = None, arm_action_mode='abs_joint_velocity'):
         self._observation_mode = observation_mode
         self._render_mode = render_mode
         obs_config = ObservationConfig()
@@ -32,12 +32,38 @@ class RLBenchEnv(gym.Env):
 
         action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
 
-        # action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
-        # action_mode = ActionMode(ArmActionMode.EE_POSE_PLAN_EE_FRAME)        
-        # action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN)
+        if arm_action_mode == 'abs_joint_velocity':
+            action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+        elif arm_action_mode == 'delta_joint_velocity':
+            action_mode = ActionMode(ArmActionMode.DELTA_JOINT_VELOCITY)
+        elif arm_action_mode == 'abs_joint_position':
+            action_mode = ActionMode(ArmActionMode.ABS_JOINT_POSITION)
+        elif arm_action_mode == 'delta_joint_position':
+            action_mode = ActionMode(ArmActionMode.DELTA_JOINT_POSITION)
+        elif arm_action_mode == 'abs_joint_torque':
+            action_mode = ActionMode(ArmActionMode.ABS_JOINT_TORQUE)
+        elif arm_action_mode == 'delta_joint_torque':
+            action_mode = ActionMode(ArmActionMode.DELTA_JOINT_TORQUE)
+        elif arm_action_mode == 'abs_ee_pose_world_frame':
+            action_mode = ActionMode(ArmActionMode.ABS_EE_POSE_WORLD_FRAME)
+        elif arm_action_mode == 'delta_ee_pose_world_frame':
+            action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_WORLD_FRAME)
+        elif arm_action_mode == 'abs_ee_pose_plan_world_frame':
+            action_mode = ActionMode(ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME)
+        elif arm_action_mode == 'delta_ee_pose_plan_world_frame':
+            action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
+        elif arm_action_mode == 'ee_pose_ee_frame':
+            action_mode = ActionMode(ArmActionMode.EE_POSE_EE_FRAME)
+        elif arm_action_mode == 'ee_pose_plan_ee_frame':
+            action_mode = ActionMode(ArmActionMode.EE_POSE_PLAN_EE_FRAME)
+        else:
+            print("RLBench Env was passed a non-existent arm action mode! Aborting")
+            exit(1)
+
         self.env = Environment(
             action_mode, obs_config=obs_config, headless=True)
         self.env.launch()
+        
         self.task = self.env.get_task(task_class)
 
         _, obs = self.task.reset()
