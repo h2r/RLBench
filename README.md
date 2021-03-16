@@ -1,5 +1,4 @@
-# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=master)](https://travis-ci.com/stepjam/RLBench) [![Discord](https://img.shields.io/discord/694945190867370155.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/DXPCjmd)
-
+# RLBench: Robot Learning Benchmark [![Unit Tests](https://github.com/stepjam/RLBench/workflows/Unit%20Tests/badge.svg)](https://github.com/stepjam/RLBench/actions) [![Task Tests](https://github.com/stepjam/RLBench/workflows/Task%20Tests/badge.svg)](https://github.com/stepjam/RLBench/actions) [![Discord](https://img.shields.io/discord/694945190867370155.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/DXPCjmd)
 
 ![task grid image missing](readme_files/task_grid.png)
 
@@ -51,17 +50,6 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 ### 17 December, 2019
 
 - Gym is now supported!
-
-### 26 September, 2019
-- Given the scope of this project, we expect there to be a number of issues over
-the coming months. Please be patient during this time. 
-After the initial few weeks of release, we will tag a commit as _'V1'_, which 
-should then be used for benchmarking algorithms going forward. Once there are enough 
-significant changes in the future, we will tag a new _'V2'_ commit, 
-and so on. Versioning like this will ensure results remain consistent and 
-reproducible as the benchmark grows.
-- Currently, only **live demos** are available when requesting demos. Stored 
-demos will be made available soon!
 
 
 ## Install
