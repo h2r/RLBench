@@ -30,8 +30,6 @@ class RLBenchEnv(gym.Env):
             raise ValueError(
                 'Unrecognised observation_mode: %s.' % observation_mode)
 
-        action_mode = ActionMode(ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
-
         if arm_action_mode == 'abs_joint_velocity':
             action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
         elif arm_action_mode == 'delta_joint_velocity':
